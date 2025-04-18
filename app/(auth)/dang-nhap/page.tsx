@@ -2,26 +2,66 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   EyeIcon,
   EyeOffIcon,
+  Loader2Icon,
   LockIcon,
   MailIcon,
-  UserIcon,
 } from "lucide-react";
 import type { Login as LoginType } from "@/@types/Auth";
+import { authenticate } from "@/services/authService";
+import useAuthStore from "@/store/authStore";
+import { HttpStatus } from "@/constants/httpStatus";
+import { showToast } from "@/helpers/toastHelper";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { login, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginType>();
+
+  const onSubmit = async (data: LoginType) => {
+    setLoading(true);
+    try {
+      const response = await authenticate(data);
+      if (response && response.status == HttpStatus.OK) {
+        const loginData = {
+          access_token: response.access_token,
+          token_type: response.token_type,
+          user: response.user,
+        };
+        login(loginData);
+        router.push("/");
+
+        showToast("Xin chào, " + response.user.name, "success");
+      } else if (response && response.status == HttpStatus.UNAUTHORIZED) {
+        showToast(response.error, "error");
+      }
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full mt-10 flex items-center justify-center">
@@ -42,7 +82,7 @@ const LoginPage = () => {
             </Link>
           </div>
 
-          <form className="mt-10 space-y-4">
+          <form className="mt-10 space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="relative">
               <Input
                 className="rounded-2xl h-12 w-full pl-10 shadow-none"
@@ -106,9 +146,14 @@ const LoginPage = () => {
 
             <Button
               type="submit"
-              className="text-md cursor-pointer rounded-2xl h-12 w-full shadow-none bg-[#d61117] text-white hover:bg-[#d61117] focus:bg-[#d61117] focus:ring-2 focus:ring-[#d61117] focus:ring-offset-2"
+              className="text-md cursor-pointer rounded-2xl h-12 w-full shadow-none bg-red-600 text-white hover:bg-red-700 "
+              disabled={loading}
             >
-              Đăng nhập
+              {loading ? (
+                <Loader2Icon className="animate-spin mr-2" size={20} />
+              ) : (
+                "Đăng nhập"
+              )}
             </Button>
           </form>
 

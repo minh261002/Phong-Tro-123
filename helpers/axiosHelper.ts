@@ -3,10 +3,7 @@ import axios from "axios";
 
 const handleAxiosError = (
   error: unknown,
-  showToast: (
-    message: string,
-    type: "success" | "error" | "info" | "warning"
-  ) => void
+  showToast: (message: string, type: "success" | "error") => void
 ): void => {
   if (axios.isAxiosError(error)) {
     if (error.response) {
