@@ -1,4 +1,9 @@
-import type { Login as LoginType } from "@/@types/Auth";
+import type {
+  ForgotPassword as ForgotPasswordType,
+  Login as LoginType,
+  Register as RegisterType,
+  ResetPassword as ResetPasswordType,
+} from "@/@types/Auth";
 import { handleAxiosError } from "@/helpers/axiosHelper";
 import axiosInstance from "@/lib/axios";
 import { showToast } from "@/helpers/toastHelper";
@@ -15,4 +20,52 @@ const authenticate = async (data: LoginType) => {
   }
 };
 
-export { authenticate };
+const register = async (data: RegisterType) => {
+  try {
+    const response = await axiosInstance.post("/auth/register", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+const forgotPassword = async (data: ForgotPasswordType) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/forgot", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+const verifyOtp = async (data: { email: string; otp_code: string }) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/verify-otp", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+const resetPassword = async (data: ResetPasswordType) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/reset", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+export { authenticate, register, forgotPassword, verifyOtp, resetPassword };
