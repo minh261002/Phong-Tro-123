@@ -2,6 +2,7 @@ import type {
   ForgotPassword as ForgotPasswordType,
   Login as LoginType,
   Register as RegisterType,
+  ResetPassword as ResetPasswordType,
 } from "@/@types/Auth";
 import { handleAxiosError } from "@/helpers/axiosHelper";
 import axiosInstance from "@/lib/axios";
@@ -55,4 +56,16 @@ const verifyOtp = async (data: { email: string; otp_code: string }) => {
   }
 };
 
-export { authenticate, register, forgotPassword, verifyOtp };
+const resetPassword = async (data: ResetPasswordType) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/reset", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+export { authenticate, register, forgotPassword, verifyOtp, resetPassword };
