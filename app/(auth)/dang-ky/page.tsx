@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -7,23 +7,59 @@ import { Input } from "@/components/ui/input";
 import {
   EyeIcon,
   EyeOffIcon,
+  Loader2Icon,
   LockIcon,
   MailIcon,
   UserIcon,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type { Register as RegisterType } from "@/@types/Auth";
+import { register as registerService } from "@/services/authService";
+import { showToast } from "@/helpers/toastHelper";
+import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import { HttpStatus } from "@/constants/httpStatus";
+
 const RegisterPage = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { isAuthenticated, login } = useAuthStore();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterType>();
+  const router = useRouter();
 
-  const onSubmit = (data: RegisterType) => {
-    console.log(data);
+  const onSubmit = async (data: RegisterType) => {
+    setLoading(true);
+    try {
+      const response = await registerService(data);
+      if (response && response.status == HttpStatus.OK) {
+        const loginData = {
+          access_token: response.access_token,
+          token_type: response.token_type,
+          user: response.user,
+        };
+        login(loginData);
+        router.push("/");
+
+        showToast("Xin chào, " + response.user.name, "success");
+      } else {
+        showToast(response.error, "error");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <div className="w-full mt-10 flex items-center justify-center">
@@ -128,8 +164,13 @@ const RegisterPage = () => {
             <Button
               type="submit"
               className="text-md cursor-pointer rounded-2xl h-12 w-full shadow-none bg-[#d61117] text-white hover:bg-[#d61117] focus:bg-[#d61117] focus:ring-2 focus:ring-[#d61117] focus:ring-offset-2"
+              disabled={loading}
             >
-              Đăng ký
+              {loading ? (
+                <Loader2Icon className="animate-spin mr-2" size={20} />
+              ) : (
+                <span>Đăng ký</span>
+              )}
             </Button>
           </form>
 

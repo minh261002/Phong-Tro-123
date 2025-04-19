@@ -8,9 +8,20 @@ const handleAxiosError = (
   if (axios.isAxiosError(error)) {
     if (error.response) {
       const statusCode = error.response.status;
-
       if (statusCode == HttpStatus.BAD_REQUEST) {
-        showToast(error.response.data.message || "Invalid data", "error");
+        const messageValidate = error.response.data.message_validate;
+        if (messageValidate) {
+          for (const key in messageValidate) {
+            if (Object.prototype.hasOwnProperty.call(messageValidate, key)) {
+              const messages = messageValidate[key];
+              if (Array.isArray(messages)) {
+                messages.forEach((message) => {
+                  showToast(message, "error");
+                });
+              }
+            }
+          }
+        }
       }
     } else if (error.request) {
       console.error("No response received from server.");

@@ -85,8 +85,6 @@ const Header = () => {
                   className=" rounded-full border-none shadow-none cursor-pointer"
                   variant={"outline"}
                 >
-                  {/* <UserCircleIcon className="text-gray-400" size={18} />
-                  Tài khoản */}
                   {isAuthenticated && user ? (
                     <div className="flex items-center gap-2">
                       <Image
