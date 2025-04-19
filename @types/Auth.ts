@@ -11,6 +11,7 @@ export type Auth = {
   reward_points?: string;
   status?: string;
   refresh_token?: string;
+  role?: string;
   created_at?: string;
   updated_at?: string;
 };
