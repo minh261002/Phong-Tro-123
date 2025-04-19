@@ -1,4 +1,5 @@
 import type {
+  ForgotPassword as ForgotPasswordType,
   Login as LoginType,
   Register as RegisterType,
 } from "@/@types/Auth";
@@ -30,4 +31,28 @@ const register = async (data: RegisterType) => {
   }
 };
 
-export { authenticate, register };
+const forgotPassword = async (data: ForgotPasswordType) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/forgot", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+const verifyOtp = async (data: { email: string; otp_code: string }) => {
+  try {
+    const response = await axiosInstance.post("/auth/password/verify-otp", {
+      ...data,
+    });
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error, showToast);
+    throw error;
+  }
+};
+
+export { authenticate, register, forgotPassword, verifyOtp };

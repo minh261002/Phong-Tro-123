@@ -23,6 +23,22 @@ const handleAxiosError = (
           }
         }
       }
+
+      if (statusCode == HttpStatus.UNPROCESSABLE_ENTITY) {
+        const errors = error.response.data.errors;
+        if (errors) {
+          for (const key in errors) {
+            if (Object.prototype.hasOwnProperty.call(errors, key)) {
+              const messages = errors[key];
+              if (Array.isArray(messages)) {
+                messages.forEach((message) => {
+                  showToast(message, "error");
+                });
+              }
+            }
+          }
+        }
+      }
     } else if (error.request) {
       console.error("No response received from server.");
     } else {
