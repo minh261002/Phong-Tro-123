@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { showToast } from "@/helpers/toastHelper";
 import ReactQueryProvider from "@/providers/Provider";
+import useAuthStore from "@/store/authStore";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -20,6 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { message, type, clearToast } = useToastStore();
+  const { logout, isAuthenticated, accessToken } = useAuthStore();
 
   useEffect(() => {
     if (message && type) {

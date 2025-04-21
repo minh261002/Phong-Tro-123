@@ -141,8 +141,10 @@ const Header = () => {
               className=" rounded-full cursor-pointer"
               variant={"destructive"}
             >
-              <PencilIcon className="text-white" size={18} />
-              Đăng tin
+              <Link href="/host" className="flex items-center gap-2">
+                <PencilIcon className="text-white" size={18} />
+                Đăng tin
+              </Link>
             </Button>
           </div>
         </div>
